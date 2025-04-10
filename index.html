@@ -1,40 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spin & Win</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f0f0f0;
-            transition: background-color 0.3s;
-        }
-        .dark-mode {
-            background-color: #333;
-            color: #fff;
-        }
-        #wheelCanvas {
-            width: 300px;
-            height: 300px;
-        }
-        #spinBtn, #toggleDark {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        #result, #coins {
-            font-size: 20px;
-            margin: 10px;
-        }
-    </style>
+  <title>Spin & Win</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="container">
     <h1>Spin & Win</h1>
-    <canvas id="wheelCanvas" width="300" height="300"></canvas>
-    <button id="spinBtn">Spin!</button>
-    <button id
+
+    <div class="user-info">
+      <label for="username-input">Enter Your Name:</label>
+      <input type="text" id="username-input">
+      <button id="save-username-button">Save</button>
+      <div id="coins">Coins: 100</div>
+    </div>
+
+    <div class="wheel-container">
+      <canvas id="wheel" width="400" height="400"></canvas>
+      <button id="spin-button">Spin (10 Coins)</button>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="leaderboard-container">
+      <h2>Leaderboard</h2>
+      <div id="leaderboard"></div>
+    </div>
+
+    <div class="referral-container">
+      <label for="referral-code-input">Referral Code (Optional):</label>
+      <input type="text" id="referral-code-input">
+      <button id="submit-referral-button">Submit</button>
+    </div>
+
+    <div class="controls">
+      <button id="sound-button">Mute</button>
+      <button id="dark-mode-toggle">Dark Mode</button>
+    </div>
+
+    <div id="confetti-container"></div>
+
+    <div class="telegram-banner">
+      <a href="https://t.me/your_telegram_channel" target="_blank">Join our Telegram channel</a>
+    </div>
+
+    <div class="reward-claim-container">
+      <button id="claim-reward-button">Claim Reward</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+</html>
