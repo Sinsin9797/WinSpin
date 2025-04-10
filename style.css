@@ -2,10 +2,24 @@ body {
     font-family: Arial, sans-serif;
     text-align: center;
     background-color: #f4f4f4;
+    transition: background 0.5s;
+}
+
+.dark-mode {
+    background-color: #222;
+    color: white;
 }
 
 .game-container {
     margin-top: 50px;
+}
+
+#wheel {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: 10px solid #000;
+    background: radial-gradient(circle, yellow, orange);
 }
 
 button {
