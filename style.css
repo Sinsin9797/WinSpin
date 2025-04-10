@@ -1,73 +1,199 @@
 body {
-  font-family: sans-serif;
+  font-family: 'Arial', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   margin: 0;
-  background-color: #f0f0f0;
+  background: linear-gradient(135deg, #fdd835, #e040fb); /* కలర్‌ఫుల్ బ్యాక్‌గ్రౌండ్ */
+  background-size: 200% 200%;
+  animation: gradientAnimation 8s ease infinite;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .dark-mode {
-  background-color: #333;
-  color: #fff;
+  background: #333;
 }
 
 .container {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.9); /* కొంచెం ట్రాన్స్‌పరెంట్ వైట్ బ్యాక్‌గ్రౌండ్ */
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   text-align: center;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .dark-mode .container {
-  background-color: #444;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  background-color: rgba(51, 51, 51, 0.9);
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode h1 {
+  color: #eee;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.user-info, .wheel-area, .leaderboard-container, .referral-container, .controls, .telegram-banner, .reward-claim-container {
+  margin-top: 25px;
+}
+
+.wheel-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .wheel-container {
   position: relative;
-  margin: 20px 0;
+  margin-bottom: 15px;
 }
 
 #spin-button {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 10px 20px;
-  font-size: 18px;
+  background-color: #007bff;
+  color: white;
+  padding: 12px 24px;
+  font-size: 20px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#spin-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+#spin-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
 }
 
 #result {
   margin-top: 20px;
+  font-size: 18px;
   font-weight: bold;
+  color: #28a745; /* గెలిచినప్పుడు ఆకుపచ్చ రంగు */
 }
 
-.leaderboard-container {
-  margin-top: 30px;
+.leaderboard-container h2 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.dark-mode .leaderboard-container h2 {
+  color: #eee;
 }
 
 #leaderboard {
   margin-top: 10px;
   text-align: left;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
 }
 
-.referral-container, .controls, .telegram-banner, .reward-claim-container, .user-info {
-  margin-top: 20px;
+.dark-mode #leaderboard {
+  border-color: #666;
+  background-color: #555;
+  color: #eee;
+}
+
+.leaderboard div {
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.dark-mode .leaderboard div {
+  border-bottom-color: #888;
+}
+
+.leaderboard div:last-child {
+  border-bottom: none;
+}
+
+.referral-container label, .user-info label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.dark-mode .referral-container label, .dark-mode .user-info label {
+  color: #ccc;
+}
+
+.referral-container input[type="text"], .user-info input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dark-mode .referral-container input[type="text"], .dark-mode .user-info input[type="text"] {
+  background-color: #444;
+  color: #eee;
+  border-color: #666;
+}
+
+.referral-container button, .user-info button, .controls button, .reward-claim-container button {
+  background-color: #28a745; /* సేవ్ మరియు ఇతర బటన్‌ల కోసం ఆకుపచ్చ రంగు */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 5px;
+}
+
+.referral-container button:hover, .user-info button:hover, .controls button:hover, .reward-claim-container button:hover {
+  background-color: #1e7e34;
+}
+
+.controls button {
+  background-color: #6c757d; /* మ్యూట్/డార్క్ మోడ్ బటన్‌ల కోసం బూడిద రంగు */
+}
+
+.controls button:hover {
+  background-color: #5a6268;
+}
+
+.telegram-banner {
+  margin-top: 30px;
 }
 
 .telegram-banner a {
-  color: blue;
+  color: #007bff;
   text-decoration: none;
+  font-weight: bold;
 }
 
 .dark-mode .telegram-banner a {
-  color: lightblue;
+  color: #66b0ff;
 }
 
 #confetti-container {
@@ -77,4 +203,15 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+#referral-code {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #007bff; /* రెఫరల్ కోడ్ కోసం నీలం రంగు */
+  font-weight: bold;
+}
+
+.dark-mode #referral-code {
+  color: #66b0ff;
 }
