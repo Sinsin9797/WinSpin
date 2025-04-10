@@ -1,68 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spin Wheel Game</title>
-  <style>
-    body {
-      background: #f0f0f0;
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 100vh;
-      margin: 0;
-    }
-    #wheel {
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      border: 5px solid #333;
-      line-height: 300px;
-      text-align: center;
-      font-size: 24px;
-      background: #fff;
-      position: relative;
-      transition: transform 4s ease-out;
-    }
-    #spinButton {
-      margin-top: 20px;
-      padding: 15px 30px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin & Win</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            transition: background-color 0.3s;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        #wheel {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 4s ease-out;
+        }
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+        #spinBtn, #toggleDark {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #result, #coins {
+            font-size: 20px;
+            margin: 10px;
+        }
+        canvas {
+            display: none; /* Used for confetti */
+        }
+    </style>
 </head>
 <body>
-  <div id="wheel">Spin Me!</div>
-  <button id="spinButton">Spin</button>
+    <h1>Spin & Win</h1>
+    <div id="wheel"></div>
+    <button id="spinBtn">Spin!</button>
+    <button id="toggleDark">Toggle Dark Mode</button>
+    <div id="result"></div>
+    <div id="coins">Coins: 100</div>
+    <canvas id="confettiCanvas"></canvas>
 
-  <script>
-    // Prevent multiple spins at once
-    let spinning = false;
-    // Store the current rotation angle
-    let currentRotation = 0;
-
-    document.getElementById("spinButton").addEventListener("click", function() {
-      if (spinning) return; // Exit if already spinning
-      spinning = true;
-
-      // Calculate a rotation angle: adding 3600 degrees ensures multiple spins for a dramatic effect.
-      let randomDegrees = 3600 + Math.floor(Math.random() * 360);
-      currentRotation += randomDegrees;
-      document.getElementById("wheel").style.transform = `rotate(${currentRotation}deg)`;
-
-      // After the spin stops, you can decide what to do based on the final angle.
-      setTimeout(() => {
-        spinning = false;
-        let normalizedRotation = currentRotation % 360;
-        console.log("Final angle:", normalizedRotation);
-        // Determine prize based on normalizedRotation if needed:
-        // For example, you can create segments (0-60, 60-120, etc.) and assign rewards.
-      }, 4000); // Animation duration: 4 seconds
-    });
-  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confetti/0.1.0/jquery.confetti.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
