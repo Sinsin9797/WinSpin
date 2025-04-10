@@ -1,12 +1,17 @@
 let coins = 100;
+let wheel = document.getElementById('wheel');
+
 document.getElementById('spin-btn').addEventListener('click', function () {
-    let outcome = Math.floor(Math.random() * 6) + 1; // Random number (1-6)
-    let rewards = [10, 20, 50, 100, 5, 0]; // Possible rewards
+    let rotation = Math.floor(Math.random() * 360) + 1440; // Random spin value
+    wheel.style.transition = "transform 3s ease-out";
+    wheel.style.transform = `rotate(${rotation}deg)`;
 
-    coins += rewards[outcome - 1]; // Add reward to coins
-    document.getElementById('coins').textContent = coins;
-
-    document.getElementById('win-message').textContent = `You won ${rewards[outcome - 1]} coins!`;
+    setTimeout(() => {
+        let reward = [10, 20, 50, 100, 5, 0][Math.floor(Math.random() * 6)];
+        coins += reward;
+        document.getElementById('coins').textContent = coins;
+        document.getElementById('win-message').textContent = `🎉 You won ${reward} coins! 🎉`;
+    }, 3000);
 });
 
 // Dark Mode Toggle
@@ -14,7 +19,7 @@ document.getElementById('dark-mode-btn').addEventListener('click', function () {
     document.body.classList.toggle('dark-mode');
 });
 
-// Sound Effects Toggle (Example)
+// Sound Effects Toggle
 document.getElementById('mute-btn').addEventListener('click', function () {
     alert("Sound muted/unmuted! (Replace with actual audio logic)");
 });
