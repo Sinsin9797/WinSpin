@@ -4,11 +4,14 @@ const centerX = wheelCanvas.width / 2;
 const centerY = wheelCanvas.height / 2;
 
 const segments = [
-  { name: 'Segment 1', color: '#e74c3c', reward: 10, icon: null }, // ఎరుపు
-  { name: 'Segment 2', color: '#27ae60', reward: 20, icon: null }, // ఆకుపచ్చ
-  { name: 'Segment 3', color: '#3498db', reward: 30, icon: null }, // నీలం
-  { name: 'Segment 4', color: '#f39c12', reward: 40, icon: null }, // నారింజ
-  { name: 'Segment 5', color: '#9b59b6', reward: 50, icon: null }, // ఊదా
+  { name: '2', color: '#81D4FA', reward: 2, icon: null },
+  { name: 'BONUS', color: '#FFB300', reward: 100, icon: null },
+  { name: '6', color: '#80CBC4', reward: 6, icon: null },
+  { name: 'SORRY', color: '#BA68C8', reward: 0, icon: null },
+  { name: '8', color: '#CE93D8', reward: 8, icon: null },
+  { name: 'SPIN AGAIN', color: '#FDD835', reward: 0, icon: null },
+  { name: '4', color: '#4DB6AC', reward: 4, icon: null },
+  { name: '8', color: '#E6EE9C', reward: 8, icon: null },
 ];
 const numSegments = segments.length;
 const spinCost = 10;
@@ -16,7 +19,7 @@ const dailySpinLimit = 5;
 
 let rotation = 0;
 let spinning = false;
-const spinDuration = 5000; // మరింత మెరుగైన యానిమేషన్ కోసం వ్యవధిని పెంచండి
+const spinDuration = 5000;
 let spinStartTime;
 let currentReward = 0;
 let spinsToday = parseInt(localStorage.getItem('spinsToday')) || 0;
@@ -35,6 +38,7 @@ const darkModeButton = document.getElementById('dark-mode-toggle');
 const confettiContainer = document.getElementById('confetti-container');
 const claimRewardButton = document.getElementById('claim-reward-button');
 const referralCodeDisplay = document.getElementById('referral-code');
+const dailyCheckinButton = document.getElementById('daily-checkin-button');
 
 let isMuted = localStorage.getItem('isMuted') === 'true' || false;
 const spinSound = new Audio('spin.mp3');
@@ -48,6 +52,9 @@ let userData = {
   referredBy: localStorage.getItem('referredBy') || null,
   leaderboard: JSON.parse(localStorage.getItem('leaderboard')) || [],
 };
+
+let lastCheckinDate = localStorage.getItem('lastCheckinDate') || null;
+const checkinReward = 50;
 
 function generateReferralCode() {
   const usernamePart = userData.username ? userData.username.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : 'guest';
@@ -107,18 +114,16 @@ function drawWheel() {
     ctx.lineTo(centerX, centerY);
     ctx.fill();
 
-    // టెక్స్ట్ మరియు ఐకాన్‌లను మరింత స్పష్టంగా గీయడం
-    ctx.fillStyle = 'white';
-    ctx.font = '16px sans-serif';
+    ctx.fillStyle = 'black';
+    ctx.font = 'bold 20px sans-serif';
     ctx.textAlign = 'center';
     const textRadius = centerX * 0.6;
     const textX = centerX + textRadius * Math.cos(startAngle + angle / 2);
-    const textY = centerY + textRadius * Math.sin(startAngle + angle / 2) + 5; // కొంచెం కిందకు
+    const textY = centerY + textRadius * Math.sin(startAngle + angle / 2) + 7;
 
-    // టెక్స్ట్ రొటేట్ చేసి గీయడం
     ctx.save();
     ctx.translate(textX, textY);
-    ctx.rotate(startAngle + angle / 2 + Math.PI / 2); // టెక్స్ట్ నిలువుగా ఉండేలా
+    ctx.rotate(startAngle + angle / 2 + Math.PI / 2);
     ctx.fillText(segments[i].name, 0, 0);
     ctx.restore();
 
@@ -136,7 +141,6 @@ function drawWheel() {
     }
   }
 
-  // పాయింటర్‌ను మరింత స్పష్టంగా గీయడం
   ctx.fillStyle = 'black';
   ctx.beginPath();
   ctx.moveTo(centerX, centerY - centerX - 15);
@@ -160,8 +164,8 @@ function onSpinEnd() {
   currentReward = winningSegment.reward;
 
   resultElement.textContent = `You landed on ${winningSegment.name} and won ${currentReward} coins!`;
+  animateCoins(userData.coins, userData.coins + currentReward);
   userData.coins += currentReward;
-  updateCoinsDisplay();
   updateLeaderboard();
   saveUserData();
   showConfetti();
@@ -184,14 +188,15 @@ function spinWheel() {
   }
 
   spinning = true;
+  animateCoins(userData.coins, userData.coins - spinCost);
   userData.coins -= spinCost;
   spinsToday++;
   localStorage.setItem('spinsToday', spinsToday);
-  updateCoinsDisplay();
+  updateLeaderboard();
   saveUserData();
   updateSpinButtonState();
 
-  const randomSpinAngle = Math.PI * 2 * 8 + Math.random() * Math.PI * 2; // మరింత వేగంగా మరియు ఎక్కువ భ్రమణాల కోసం
+  const randomSpinAngle = Math.PI * 2 * 8 + Math.random() * Math.PI * 2;
   const animationDuration = spinDuration;
   spinStartTime = Date.now();
 
@@ -207,7 +212,7 @@ function spinWheel() {
       return;
     }
 
-    const ease = (t) => t * t * (3 - 2 * t); // క్యూబిక్ ఈజింగ్
+    const ease = (t) => t * t * (3 - 2 * t);
     const timeFraction = ease(elapsedTime / animationDuration);
     rotation = randomSpinAngle * timeFraction;
 
@@ -222,8 +227,26 @@ function spinWheel() {
   animateSpin();
 }
 
+function animateCoins(startValue, endValue) {
+  let currentValue = startValue;
+  const duration = 1000;
+  const startTime = Date.now();
+
+  function update() {
+    const elapsedTime = Date.now() - startTime;
+    const progress = Math.min(elapsedTime / duration, 1);
+    currentValue = Math.floor(startValue + (endValue - startValue) * progress);
+    coinsElement.textContent = `Coins: ${currentValue}`;
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  update();
+}
+
 function updateCoinsDisplay() {
-  coinsElement.textContent = `Coins: ${userData.coins}`;
+  // animateCoins ఫంక్షన్‌లోనే కాయిన్స్ డిస్‌ప్లే అప్‌డేట్ అవుతుంది
 }
 
 function updateLeaderboard() {
@@ -262,7 +285,8 @@ function handleReferral() {
     userData.coins += 25;
     userData.referredBy = referralCode;
     saveUserData();
-    updateCoinsDisplay();
+    animateCoins(userData.coins - 25, userData.coins);
+    updateLeaderboard();
     alert('Referral code applied! You received 25 coins.');
   } else if (userData.referral === referralCode) {
     alert('This is your own referral code.');
@@ -289,7 +313,7 @@ function toggleDarkMode() {
 
 function showConfetti() {
   confetti({
-    particleCount: 200, // మరింత కాన్ఫెట్టి
+    particleCount: 200,
     spread: 100,
     origin: { y: 0.7 },
   });
@@ -312,6 +336,30 @@ function loadSoundPreference() {
   winSound.muted = isMuted;
 }
 
+function checkDailyCheckin() {
+  const today = new Date().toDateString();
+  if (lastCheckinDate !== today) {
+    dailyCheckinButton.disabled = false;
+    dailyCheckinButton.textContent = 'Daily Checkin';
+  } else {
+    dailyCheckinButton.disabled = true;
+    dailyCheckinButton.textContent = 'Checked In Today';
+  }
+}
+
+function handleDailyCheckin() {
+  const today = new Date().toDateString();
+  if (lastCheckinDate !== today) {
+    userData.coins += checkinReward;
+    animateCoins(userData.coins - checkinReward, userData.coins);
+    saveUserData();
+    lastCheckinDate = today;
+    localStorage.setItem('lastCheckinDate', lastCheckinDate);
+    checkDailyCheckin();
+    alert(`You claimed your daily check-in reward of ${checkinReward} coins!`);
+  }
+}
+
 // Event listeners
 spinButton.addEventListener('click', spinWheel);
 saveUsernameButton.addEventListener('click', handleUsernameSave);
@@ -319,14 +367,16 @@ submitReferralButton.addEventListener('click', handleReferral);
 soundButton.addEventListener('click', toggleSound);
 darkModeButton.addEventListener('click', toggleDarkMode);
 claimRewardButton.addEventListener('click', claimReward);
-
-// Initial setup
-loadDarkModePreference();
-loadSoundPreference();
-checkDailySpinReset();
-updateCoinsDisplay();
-updateLeaderboard();
-drawWheel();
-if (userData.username) {
-  referralCodeDisplay.textContent = `Your Referral Code: ${userData.referral}`;
-}
+dailyCheckinButton.addEventListener('click', handleDailyCheckin);
+window.onload = () => {
+  loadDarkModePreference();
+  loadSoundPreference();
+  checkDailySpinReset();
+  checkDailyCheckin();
+  animateCoins(0, userData.coins);
+  updateLeaderboard();
+  drawWheel();
+  if (userData.username) {
+    referralCodeDisplay.textContent = `Your Referral Code: ${userData.referral}`;
+  }
+};
