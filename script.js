@@ -4,11 +4,11 @@ const centerX = wheelCanvas.width / 2;
 const centerY = wheelCanvas.height / 2;
 
 const segments = [
-  { name: 'Segment 1', color: '#FF0000', reward: 10, icon: null }, // icon: 'path/to/icon1.png'
-  { name: 'Segment 2', color: '#00FF00', reward: 20, icon: null },
-  { name: 'Segment 3', color: '#0000FF', reward: 30, icon: null },
-  { name: 'Segment 4', color: '#FFFF00', reward: 40, icon: null },
-  { name: 'Segment 5', color: '#FF00FF', reward: 50, icon: null },
+  { name: 'Segment 1', color: '#e74c3c', reward: 10, icon: null }, // ఎరుపు
+  { name: 'Segment 2', color: '#27ae60', reward: 20, icon: null }, // ఆకుపచ్చ
+  { name: 'Segment 3', color: '#3498db', reward: 30, icon: null }, // నీలం
+  { name: 'Segment 4', color: '#f39c12', reward: 40, icon: null }, // నారింజ
+  { name: 'Segment 5', color: '#9b59b6', reward: 50, icon: null }, // ఊదా
 ];
 const numSegments = segments.length;
 const spinCost = 10;
@@ -16,7 +16,7 @@ const dailySpinLimit = 5;
 
 let rotation = 0;
 let spinning = false;
-const spinDuration = 3000;
+const spinDuration = 5000; // మరింత మెరుగైన యానిమేషన్ కోసం వ్యవధిని పెంచండి
 let spinStartTime;
 let currentReward = 0;
 let spinsToday = parseInt(localStorage.getItem('spinsToday')) || 0;
@@ -34,26 +34,34 @@ const soundButton = document.getElementById('sound-button');
 const darkModeButton = document.getElementById('dark-mode-toggle');
 const confettiContainer = document.getElementById('confetti-container');
 const claimRewardButton = document.getElementById('claim-reward-button');
+const referralCodeDisplay = document.getElementById('referral-code');
 
-let isMuted = false;
-const spinSound = new Audio(''); // Replace with your sound file path
-const winSound = new Audio('');   // Replace with your sound file path
+let isMuted = localStorage.getItem('isMuted') === 'true' || false;
+const spinSound = new Audio('spin.mp3');
+const winSound = new Audio('win.mp3');
 let isDarkMode = localStorage.getItem('darkMode') === 'true' || false;
 
 let userData = {
   coins: parseInt(localStorage.getItem('userCoins')) || 100,
   username: localStorage.getItem('username') || '',
-  referrals: parseInt(localStorage.getItem('referrals')) || 0,
+  referral: localStorage.getItem('referral') || generateReferralCode(),
   referredBy: localStorage.getItem('referredBy') || null,
   leaderboard: JSON.parse(localStorage.getItem('leaderboard')) || [],
 };
 
+function generateReferralCode() {
+  const usernamePart = userData.username ? userData.username.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : 'guest';
+  const randomNumber = Math.random().toString(36).substring(2, 5);
+  return `${usernamePart}@${randomNumber}`;
+}
+
 function saveUserData() {
   localStorage.setItem('userCoins', userData.coins);
   localStorage.setItem('username', userData.username);
-  localStorage.setItem('referrals', userData.referrals);
+  localStorage.setItem('referral', userData.referral);
   localStorage.setItem('referredBy', userData.referredBy);
   localStorage.setItem('leaderboard', JSON.stringify(userData.leaderboard));
+  localStorage.setItem('isMuted', isMuted);
 }
 
 function checkDailySpinReset() {
@@ -82,6 +90,7 @@ function drawWheel() {
   ctx.beginPath();
   ctx.arc(centerX, centerY, centerX, 0, 2 * Math.PI);
   ctx.strokeStyle = 'black';
+  ctx.lineWidth = 2;
   ctx.stroke();
   ctx.fillStyle = '#FFFFFF';
   ctx.fill();
@@ -98,6 +107,21 @@ function drawWheel() {
     ctx.lineTo(centerX, centerY);
     ctx.fill();
 
+    // టెక్స్ట్ మరియు ఐకాన్‌లను మరింత స్పష్టంగా గీయడం
+    ctx.fillStyle = 'white';
+    ctx.font = '16px sans-serif';
+    ctx.textAlign = 'center';
+    const textRadius = centerX * 0.6;
+    const textX = centerX + textRadius * Math.cos(startAngle + angle / 2);
+    const textY = centerY + textRadius * Math.sin(startAngle + angle / 2) + 5; // కొంచెం కిందకు
+
+    // టెక్స్ట్ రొటేట్ చేసి గీయడం
+    ctx.save();
+    ctx.translate(textX, textY);
+    ctx.rotate(startAngle + angle / 2 + Math.PI / 2); // టెక్స్ట్ నిలువుగా ఉండేలా
+    ctx.fillText(segments[i].name, 0, 0);
+    ctx.restore();
+
     if (segments[i].icon) {
       const img = new Image();
       img.onload = () => {
@@ -112,12 +136,12 @@ function drawWheel() {
     }
   }
 
-  // Draw the pointer
+  // పాయింటర్‌ను మరింత స్పష్టంగా గీయడం
   ctx.fillStyle = 'black';
   ctx.beginPath();
-  ctx.moveTo(centerX, centerY - centerX - 10);
-  ctx.lineTo(centerX - 10, centerY - centerX - 20);
-  ctx.lineTo(centerX + 10, centerY - centerX - 20);
+  ctx.moveTo(centerX, centerY - centerX - 15);
+  ctx.lineTo(centerX - 15, centerY - centerX - 30);
+  ctx.lineTo(centerX + 15, centerY - centerX - 30);
   ctx.closePath();
   ctx.fill();
 }
@@ -167,7 +191,7 @@ function spinWheel() {
   saveUserData();
   updateSpinButtonState();
 
-  const randomSpinAngle = Math.PI * 2 * 5 + Math.random() * Math.PI * 2;
+  const randomSpinAngle = Math.PI * 2 * 8 + Math.random() * Math.PI * 2; // మరింత వేగంగా మరియు ఎక్కువ భ్రమణాల కోసం
   const animationDuration = spinDuration;
   spinStartTime = Date.now();
 
@@ -183,7 +207,7 @@ function spinWheel() {
       return;
     }
 
-    const ease = (t) => t * t * (3 - 2 * t);
+    const ease = (t) => t * t * (3 - 2 * t); // క్యూబిక్ ఈజింగ్
     const timeFraction = ease(elapsedTime / animationDuration);
     rotation = randomSpinAngle * timeFraction;
 
@@ -211,7 +235,7 @@ function updateLeaderboard() {
       userData.leaderboard.push({ username: userData.username, coins: userData.coins });
     }
     userData.leaderboard.sort((a, b) => b.coins - a.coins);
-    localStorage.setItem('leaderboard', JSON.stringify(userData.leaderboard.slice(0, 5))); // Keep top 5
+    localStorage.setItem('leaderboard', JSON.stringify(userData.leaderboard.slice(0, 5)));
   }
   const leaderboardHTML = userData.leaderboard.slice(0, 5).map(entry => `<div>${entry.username || 'Anonymous'}: ${entry.coins}</div>`).join('');
   leaderboardElement.innerHTML = leaderboardHTML || 'No entries yet.';
@@ -221,7 +245,10 @@ function handleUsernameSave() {
   const username = usernameInput.value.trim();
   if (username) {
     userData.username = username;
+    userData.referral = generateReferralCode();
+    referralCodeDisplay.textContent = `Your Referral Code: ${userData.referral}`;
     localStorage.setItem('username', username);
+    localStorage.setItem('referral', userData.referral);
     updateLeaderboard();
     alert(`Username saved: ${userData.username}`);
   } else {
@@ -231,13 +258,14 @@ function handleUsernameSave() {
 
 function handleReferral() {
   const referralCode = referralCodeInput.value.trim();
-  if (referralCode && userData.referredBy !== referralCode) {
-    // In a real app, verify the code. For now, just award coins.
-    userData.coins += 25; // Example referral reward
+  if (referralCode && userData.referral !== referralCode && userData.referredBy !== referralCode) {
+    userData.coins += 25;
     userData.referredBy = referralCode;
     saveUserData();
     updateCoinsDisplay();
     alert('Referral code applied! You received 25 coins.');
+  } else if (userData.referral === referralCode) {
+    alert('This is your own referral code.');
   } else if (userData.referredBy === referralCode) {
     alert('You have already used this referral code.');
   } else if (referralCode) {
@@ -248,6 +276,9 @@ function handleReferral() {
 function toggleSound() {
   isMuted = !isMuted;
   soundButton.textContent = isMuted ? 'Unmute' : 'Mute';
+  localStorage.setItem('isMuted', isMuted);
+  spinSound.muted = isMuted;
+  winSound.muted = isMuted;
 }
 
 function toggleDarkMode() {
@@ -258,21 +289,27 @@ function toggleDarkMode() {
 
 function showConfetti() {
   confetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 },
+    particleCount: 200, // మరింత కాన్ఫెట్టి
+    spread: 100,
+    origin: { y: 0.7 },
   });
 }
 
 function claimReward() {
   alert(`You have ${userData.coins} coins. Reward claim functionality needs to be implemented.`);
-  // Implement your reward claim logic here
 }
 
 function loadDarkModePreference() {
   if (isDarkMode) {
     document.body.classList.add('dark-mode');
   }
+}
+
+function loadSoundPreference() {
+  isMuted = localStorage.getItem('isMuted') === 'true' || false;
+  soundButton.textContent = isMuted ? 'Unmute' : 'Mute';
+  spinSound.muted = isMuted;
+  winSound.muted = isMuted;
 }
 
 // Event listeners
@@ -285,7 +322,11 @@ claimRewardButton.addEventListener('click', claimReward);
 
 // Initial setup
 loadDarkModePreference();
+loadSoundPreference();
 checkDailySpinReset();
 updateCoinsDisplay();
 updateLeaderboard();
 drawWheel();
+if (userData.username) {
+  referralCodeDisplay.textContent = `Your Referral Code: ${userData.referral}`;
+}
