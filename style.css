@@ -5,13 +5,13 @@ body {
   align-items: center;
   min-height: 100vh;
   margin: 0;
-  background: linear-gradient(135deg, #fdd835, #e040fb); /* కలర్‌ఫుల్ బ్యాక్‌గ్రౌండ్ */
-  background-size: 200% 200%;
-  animation: gradientAnimation 8s ease infinite;
+  background: linear-gradient(45deg, #1e3c72, #2a5298, #2e6aa7, #3a81b7);
+  background-size: 400% 400%;
+  animation: background-shift 10s infinite alternate;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@keyframes gradientAnimation {
+@keyframes background-shift {
   0% {
     background-position: 0% 50%;
   }
@@ -28,7 +28,7 @@ body {
 }
 
 .container {
-  background-color: rgba(255, 255, 255, 0.9); /* కొంచెం ట్రాన్స్‌పరెంట్ వైట్ బ్యాక్‌గ్రౌండ్ */
+  background-color: rgba(255, 255, 255, 0.9);
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -94,7 +94,7 @@ h1 {
   margin-top: 20px;
   font-size: 18px;
   font-weight: bold;
-  color: #28a745; /* గెలిచినప్పుడు ఆకుపచ్చ రంగు */
+  color: #28a745;
 }
 
 .leaderboard-container h2 {
@@ -160,7 +160,7 @@ h1 {
 }
 
 .referral-container button, .user-info button, .controls button, .reward-claim-container button {
-  background-color: #28a745; /* సేవ్ మరియు ఇతర బటన్‌ల కోసం ఆకుపచ్చ రంగు */
+  background-color: #28a745;
   color: white;
   padding: 10px 15px;
   border: none;
@@ -175,11 +175,24 @@ h1 {
 }
 
 .controls button {
-  background-color: #6c757d; /* మ్యూట్/డార్క్ మోడ్ బటన్‌ల కోసం బూడిద రంగు */
+  background-color: #6c757d;
 }
 
 .controls button:hover {
   background-color: #5a6268;
+}
+
+#daily-checkin-button {
+  background-color: #f39c12; /* డైలీ చెకిన్ బటన్ కోసం నారింజ రంగు */
+}
+
+#daily-checkin-button:hover {
+  background-color: #e68a00;
+}
+
+#daily-checkin-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .telegram-banner {
@@ -208,7 +221,7 @@ h1 {
 #referral-code {
   margin-top: 10px;
   font-size: 16px;
-  color: #007bff; /* రెఫరల్ కోడ్ కోసం నీలం రంగు */
+  color: #007bff;
   font-weight: bold;
 }
 
