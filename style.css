@@ -1,118 +1,113 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f2f2f2;
-  color: #333;
-  text-align: center;
+* {
+  box-sizing: border-box;
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.container {
-  max-width: 400px;
-  margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+body {
+  background: #f0f0f0;
+  color: #222;
+  transition: background 0.3s, color 0.3s;
 }
 
-h2, h3 {
-  margin-top: 10px;
+body.dark-mode {
+  background: #121212;
+  color: #eee;
+}
+
+.app-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.dark-toggle, .mute-toggle {
+  margin: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 10px 5px;
   font-weight: bold;
+}
+
+button:hover {
+  background: #125aa3;
 }
 
 input[type="text"] {
   padding: 10px;
-  width: 90%;
-  margin: 10px auto;
-  display: block;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-button {
+  border-radius: 6px;
+  border: 1px solid #aaa;
   margin: 5px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
+  width: 80%;
+  max-width: 300px;
 }
 
-#spinButton {
-  background-color: #007bff;
-  color: white;
-}
-
-#dailyCheckin {
-  background-color: orange;
-  color: white;
-}
-
-#submitReferral,
-#saveName,
-#claimReward,
-#withdrawBtn {
-  background-color: green;
-  color: white;
-}
-
-#muteButton,
-#darkModeToggle {
-  background-color: #555;
-  color: white;
-}
-
-a {
-  color: #007bff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-#leaderboard {
-  text-align: left;
-  margin: 10px auto;
-  max-height: 150px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-canvas#wheelCanvas {
-  margin-top: 20px;
-  border: 2px solid #ccc;
+#wheelCanvas {
+  border: 5px dashed #1976d2;
   border-radius: 50%;
-  background-color: #fff8f0;
+  margin: 20px auto;
+  display: block;
 }
 
-canvas#confettiCanvas {
+#confetti-holder {
   position: fixed;
-  pointer-events: none;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 999;
+  pointer-events: none;
 }
 
-/* Dark mode */
-body.dark {
-  background-color: #121212;
-  color: #fff;
-}
-
-body.dark .container {
-  background-color: #1e1e1e;
-}
-
-body.dark input,
-body.dark button {
-  background-color: #2c2c2c;
+.telegram-banner a {
+  display: inline-block;
+  margin-top: 20px;
+  background: #34ace0;
   color: white;
-  border: 1px solid #444;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
 }
 
-body.dark #leaderboard {
-  background-color: #2c2c2c;
-  border-color: #444;
+.telegram-banner a:hover {
+  background: #1e8bc3;
+}
+
+.leaderboard {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.leaderboard h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.leaderboard ul {
+  list-style: none;
+  padding: 0;
+}
+
+.leaderboard li {
+  background: #e0e0e0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 5px 0;
+}
+
+body.dark-mode .leaderboard li {
+  background: #333;
 }
