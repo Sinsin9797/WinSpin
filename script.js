@@ -1,50 +1,49 @@
-// Full Spin Wheel Game with 20 features (JS File) // Firebase + Telegram + LocalStorage + Game Logic + UI Toggles
+// Firebase & Telegram Setup const firebaseConfig = { apiKey: "AIzaSyA3HU3lmPGgngWTpb7iXqWYB4ghOb9ld_c", authDomain: "winspin-3a010.firebaseapp.com", projectId: "winspin-3a010", storageBucket: "winspin-3a010.firebasestorage.app", messagingSenderId: "1029992403673", appId: "1:1029992403673:web:a38cbddfcb8394aa1d24c8", measurementId: "G-7D7B6CRTYQ" }; const app = firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
 
-// 1. Firebase Setup import { initializeApp } from "firebase/app"; import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "firebase/firestore";
+const TELEGRAM_BOT_TOKEN = "7660325670:AAGjyxqcfafCpx-BiYNIRlPG4u5gd7NDxsI"; const TELEGRAM_CHAT_ID = "5054074724";
 
-const firebaseConfig = { apiKey: "AIzaSyA3HU3lmPGgngWTpb7iXqWYB4ghOb9ld_c", authDomain: "winspin-3a010.firebaseapp.com", projectId: "winspin-3a010", storageBucket: "winspin-3a010.appspot.com", messagingSenderId: "1029992403673", appId: "1:1029992403673:web:a38cbddfcb8394aa1d24c8", measurementId: "G-7D7B6CRTYQ" }; const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+// Elements const spinBtn = document.getElementById("spin"); const wheel = document.getElementById("wheel"); const resultText = document.getElementById("result"); const usernameInput = document.getElementById("username"); const darkToggle = document.getElementById("darkToggle"); const muteToggle = document.getElementById("muteToggle");
 
-// 2. Username Input let username = localStorage.getItem("username") || prompt("Enter your username:"); localStorage.setItem("username", username);
+// User Data let username = localStorage.getItem("username") || "Guest"; let coins = parseInt(localStorage.getItem("coins") || 100); let spinsLeft = parseInt(localStorage.getItem("spins") || 3); let isMuted = localStorage.getItem("muted") === "true";
 
-// 3. Referral Tracking const urlParams = new URLSearchParams(window.location.search); const ref = urlParams.get("ref"); if (ref) localStorage.setItem("referredBy", ref);
+// Rewards const rewards = [ { label: "10 Coins", value: 10 }, { label: "20 Coins", value: 20 }, { label: "50 Coins", value: 50 }, { label: "Try Again", value: 0 }, { label: "Lose 10", value: -10 }, ];
 
-// 4. Create User async function createUserIfNotExists() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef);
+function playSound(id) { if (!isMuted) document.getElementById(id).play(); }
 
-if (!userSnap.exists()) { await setDoc(userRef, { coins: 50, stars: 10, referralCount: 0, referredBy: localStorage.getItem("referredBy") || null, spinsToday: 0 }); if (ref) { const refUserRef = doc(db, "users", ref); await updateDoc(refUserRef, { coins: increment(20), referralCount: increment(1) }); } } } createUserIfNotExists();
+function showConfetti() { // You can integrate confetti.js or custom SVG animation }
 
-// 5. Spin Limit System async function canSpinToday() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef); const data = userSnap.data(); return data.spinsToday < 5; }
+function updateUI() { document.getElementById("coins").innerText = Coins: ${coins}; document.getElementById("spins").innerText = Spins Left: ${spinsLeft}; }
 
-async function incrementSpinCount() { const userRef = doc(db, "users", username); await updateDoc(userRef, { spinsToday: increment(1) }); }
+function saveState() { localStorage.setItem("username", username); localStorage.setItem("coins", coins); localStorage.setItem("spins", spinsLeft); }
 
-// 6. Deduct Stars for Spin async function deductStarsForSpin() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef); const data = userSnap.data(); if (data.stars >= 5) { await updateDoc(userRef, { stars: increment(-5) }); return true; } else { alert("Not enough stars"); return false; } }
+function sendTelegramAlert(text) { fetch(https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text }) }); }
 
-// 7. Spin & Win Logic (Example Only) function spinWheel() { const rewards = ["10", "20", "30", "50", "Better Luck", "100"]; const result = rewards[Math.floor(Math.random() * rewards.length)]; showResult(result); }
+function logToFirebase(data) { db.collection("spinLogs").add(data); }
 
-// 8. Show Result function showResult(result) { if (!isNaN(result)) { updateUserCoins(parseInt(result)); sendTelegramWin(result); } alert(You won: ${result}); }
+spinBtn.addEventListener("click", () => { if (spinsLeft <= 0) return alert("No spins left today!");
 
-// 9. Update Firebase Coins async function updateUserCoins(amount) { const userRef = doc(db, "users", username); await updateDoc(userRef, { coins: increment(amount) }); }
+const angle = Math.floor(Math.random() * 360); const index = Math.floor(angle / (360 / rewards.length)); const reward = rewards[index];
 
-// 10. Telegram Win Alert function sendTelegramWin(coins) { fetch("https://api.telegram.org/bot<YOUR_TOKEN>/sendMessage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: "<YOUR_CHAT_ID>", text: User ${username} won ${coins} coins on Spin Wheel! }) }); }
+wheel.style.transform = rotate(${angle + 720}deg); playSound("spinSound");
 
-// 11. Withdraw Request async function requestWithdraw() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef); const data = userSnap.data(); if (data.coins >= 50) { fetch("https://api.telegram.org/bot<YOUR_TOKEN>/sendMessage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: "<YOUR_CHAT_ID>", text: Withdraw request: ${username}, Coins: ${data.coins} }) }); alert("Withdraw requested!"); } else { alert("Minimum 50 coins required to withdraw."); } }
+setTimeout(() => { coins += reward.value; spinsLeft--; updateUI(); saveState(); resultText.innerText = You got: ${reward.label}; if (reward.value > 0) showConfetti(); playSound("winSound");
 
-// 12. Confetti (Use library) // confetti.start(); confetti.stop(); etc.
+const log = {
+  username,
+  reward: reward.label,
+  coins,
+  time: new Date().toISOString(),
+};
+logToFirebase(log);
+sendTelegramAlert(`${username} won ${reward.label} | Coins: ${coins}`);
 
-// 13. Custom Icons (handled in HTML/CSS per segment)
+}, 3000); });
 
-// 14. Dark Mode Toggle function toggleDarkMode() { document.body.classList.toggle("dark-mode"); }
+// Settings Toggles darkToggle.addEventListener("click", () => { document.body.classList.toggle("dark"); });
 
-// 15. Mute/Unmute let muted = false; function toggleMute() { muted = !muted; }
+muteToggle.addEventListener("click", () => { isMuted = !isMuted; localStorage.setItem("muted", isMuted); });
 
-// 16. Google Sheets Logging (Webhook example) function logToGoogleSheet(win) { fetch("<YOUR_GOOGLE_SCRIPT_WEBHOOK>", { method: "POST", body: JSON.stringify({ username, win }), headers: { "Content-Type": "application/json" } }); }
+usernameInput.addEventListener("change", (e) => { username = e.target.value; saveState(); });
 
-// 17. Referral Link Show function showReferralLink() { alert(Your link: ?ref=${username}); }
-
-// 18. Telegram Command (/stars, /withdraw etc) handled in Telegram Bot code
-
-// 19. Coins & Stars Display async function displayBalance() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef); const data = userSnap.data(); document.getElementById("coins").innerText = data.coins; document.getElementById("stars").innerText = data.stars; }
-
-// 20. Leaderboard - You can create a Firebase function or sort client-side
-
-// Finally, call displayBalance every time setInterval(displayBalance, 3000);
+// Init usernameInput.value = username; updateUI();
 
