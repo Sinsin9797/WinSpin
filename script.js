@@ -1,100 +1,50 @@
-const canvas = document.getElementById('wheel');
-const ctx = canvas.getContext('2d');
-const button = document.getElementById('spin-button');
-const resultElement = document.getElementById('result');
-const radius = canvas.width / 2;
-const center = radius;
+// Full Spin Wheel Game with 20 features (JS File) // Firebase + Telegram + LocalStorage + Game Logic + UI Toggles
 
-const segments = [
-  { name: '2', color: '#81D4FA', reward: 2 },
-  { name: 'BONUS', color: '#FFB300', reward: 100 },
-  { name: '6', color: '#80CBC4', reward: 6 },
-  { name: 'SORRY', color: '#BA68C8', reward: 0 },
-  { name: '8', color: '#CE93D8', reward: 8 },
-  { name: 'SPIN AGAIN', color: '#FDD835', reward: 0 },
-  { name: '4', color: '#4DB6AC', reward: 4 },
-  { name: '8', color: '#E6EE9C', reward: 8 },
-];
-const numSegments = segments.length;
-let rotation = 0;
-let spinning = false;
-const spinDuration = 3000; // మిల్లీసెకన్లు
-let spinStartTime;
-let animationFrameId;
+// 1. Firebase Setup import { initializeApp } from "firebase/app"; import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "firebase/firestore";
 
-function drawWheel() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  let startAngle = rotation;
-  const angle = Math.PI * 2 / numSegments;
-  const textRadius = radius * 0.6;
+const firebaseConfig = { apiKey: "AIzaSyA3HU3lmPGgngWTpb7iXqWYB4ghOb9ld_c", authDomain: "winspin-3a010.firebaseapp.com", projectId: "winspin-3a010", storageBucket: "winspin-3a010.appspot.com", messagingSenderId: "1029992403673", appId: "1:1029992403673:web:a38cbddfcb8394aa1d24c8", measurementId: "G-7D7B6CRTYQ" }; const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-  for (let i = 0; i < numSegments; i++) {
-    const endAngle = startAngle + angle;
+// 2. Username Input let username = localStorage.getItem("username") || prompt("Enter your username:"); localStorage.setItem("username", username);
 
-    ctx.beginPath();
-    ctx.arc(center, center, radius, startAngle, endAngle);
-    ctx.lineTo(center, center);
-    ctx.fillStyle = segments[i].color;
-    ctx.fill();
-    ctx.strokeStyle = 'black';
-    ctx.stroke();
+// 3. Referral Tracking const urlParams = new URLSearchParams(window.location.search); const ref = urlParams.get("ref"); if (ref) localStorage.setItem("referredBy", ref);
 
-    // టెక్స్ట్ డ్రా చేయడం
-    ctx.fillStyle = 'black';
-    ctx.font = 'bold 16px sans-serif';
-    ctx.textAlign = 'center';
-    const textX = center + textRadius * Math.cos(startAngle + angle / 2);
-    const textY = center + textRadius * Math.sin(startAngle + angle / 2) + 5;
-    ctx.fillText(segments[i].name, textX, textY);
+// 4. Create User async function createUserIfNotExists() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef);
 
-    startAngle = endAngle;
-  }
+if (!userSnap.exists()) { await setDoc(userRef, { coins: 50, stars: 10, referralCount: 0, referredBy: localStorage.getItem("referredBy") || null, spinsToday: 0 }); if (ref) { const refUserRef = doc(db, "users", ref); await updateDoc(refUserRef, { coins: increment(20), referralCount: increment(1) }); } } } createUserIfNotExists();
 
-  // పాయింటర్ డ్రా చేయడం
-  ctx.fillStyle = 'black';
-  ctx.beginPath();
-  ctx.moveTo(center, center - radius - 15);
-  ctx.lineTo(center - 10, center - radius - 30);
-  ctx.lineTo(center + 10, center - radius - 30);
-  ctx.closePath();
-  ctx.fill();
-}
+// 5. Spin Limit System async function canSpinToday() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef); const data = userSnap.data(); return data.spinsToday < 5; }
 
-function spin() {
-  if (spinning) return;
-  spinning = true;
-  button.disabled = true;
-  resultElement.textContent = '';
+async function incrementSpinCount() { const userRef = doc(db, "users", username); await updateDoc(userRef, { spinsToday: increment(1) }); }
 
-  const randomSpinAngle = Math.PI * 2 * 5 + Math.random() * Math.PI * 2;
-  const animationDuration = spinDuration;
-  spinStartTime = Date.now();
+// 6. Deduct Stars for Spin async function deductStarsForSpin() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef); const data = userSnap.data(); if (data.stars >= 5) { await updateDoc(userRef, { stars: increment(-5) }); return true; } else { alert("Not enough stars"); return false; } }
 
-  function animate() {
-    const currentTime = Date.now();
-    const elapsedTime = currentTime - spinStartTime;
+// 7. Spin & Win Logic (Example Only) function spinWheel() { const rewards = ["10", "20", "30", "50", "Better Luck", "100"]; const result = rewards[Math.floor(Math.random() * rewards.length)]; showResult(result); }
 
-    if (elapsedTime >= animationDuration) {
-      spinning = false;
-      button.disabled = false;
-      rotation = randomSpinAngle;
-      drawWheel();
-      const winningSegmentIndex = Math.floor((numSegments - (rotation / (Math.PI * 2)) * numSegments) % numSegments);
-      resultElement.textContent = `మీరు ${segments[winningSegmentIndex].name} పై ల్యాండ్ అయ్యారు!`;
-      return;
-    }
+// 8. Show Result function showResult(result) { if (!isNaN(result)) { updateUserCoins(parseInt(result)); sendTelegramWin(result); } alert(You won: ${result}); }
 
-    const ease = (t) => t * t * (3 - 2 * t); // ఈజ్-ఇన్-అవుట్ ఫంక్షన్
-    const timeFraction = ease(elapsedTime / animationDuration);
-    rotation = randomSpinAngle * timeFraction;
-    drawWheel();
-    animationFrameId = requestAnimationFrame(animate);
-  }
+// 9. Update Firebase Coins async function updateUserCoins(amount) { const userRef = doc(db, "users", username); await updateDoc(userRef, { coins: increment(amount) }); }
 
-  animate();
-}
+// 10. Telegram Win Alert function sendTelegramWin(coins) { fetch("https://api.telegram.org/bot<YOUR_TOKEN>/sendMessage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: "<YOUR_CHAT_ID>", text: User ${username} won ${coins} coins on Spin Wheel! }) }); }
 
-button.addEventListener('click', spin);
+// 11. Withdraw Request async function requestWithdraw() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef); const data = userSnap.data(); if (data.coins >= 50) { fetch("https://api.telegram.org/bot<YOUR_TOKEN>/sendMessage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: "<YOUR_CHAT_ID>", text: Withdraw request: ${username}, Coins: ${data.coins} }) }); alert("Withdraw requested!"); } else { alert("Minimum 50 coins required to withdraw."); } }
 
-// మొదటిసారి డ్రా చేయడం
-drawWheel();
+// 12. Confetti (Use library) // confetti.start(); confetti.stop(); etc.
+
+// 13. Custom Icons (handled in HTML/CSS per segment)
+
+// 14. Dark Mode Toggle function toggleDarkMode() { document.body.classList.toggle("dark-mode"); }
+
+// 15. Mute/Unmute let muted = false; function toggleMute() { muted = !muted; }
+
+// 16. Google Sheets Logging (Webhook example) function logToGoogleSheet(win) { fetch("<YOUR_GOOGLE_SCRIPT_WEBHOOK>", { method: "POST", body: JSON.stringify({ username, win }), headers: { "Content-Type": "application/json" } }); }
+
+// 17. Referral Link Show function showReferralLink() { alert(Your link: ?ref=${username}); }
+
+// 18. Telegram Command (/stars, /withdraw etc) handled in Telegram Bot code
+
+// 19. Coins & Stars Display async function displayBalance() { const userRef = doc(db, "users", username); const userSnap = await getDoc(userRef); const data = userSnap.data(); document.getElementById("coins").innerText = data.coins; document.getElementById("stars").innerText = data.stars; }
+
+// 20. Leaderboard - You can create a Firebase function or sort client-side
+
+// Finally, call displayBalance every time setInterval(displayBalance, 3000);
+
