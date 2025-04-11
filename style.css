@@ -1,196 +1,118 @@
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  color: #333;
+  text-align: center;
   margin: 0;
-  background-color: #f0f0f0;
+  padding: 20px;
 }
 
-.spin-wheel-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.container {
+  max-width: 400px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
 
-#wheel {
-  border: 1px solid black;
-  margin-bottom: 20px;
-}
-
-#spin-button {
-  padding: 15px 30px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-#result {
-  margin-top: 20px;
-  font-size: 18px;
+h2, h3 {
+  margin-top: 10px;
   font-weight: bold;
 }
 
-/* మీ అసలైన స్టైల్స్‌ను ఇక్కడ యాడ్ చేసుకోవచ్చు */
-.container {
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+input[type="text"] {
+  padding: 10px;
+  width: 90%;
+  margin: 10px auto;
+  display: block;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
-h1 {
-  color: #333;
-  margin-bottom: 20px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+button {
+  margin: 5px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
 }
 
-.user-info, .wheel-area, .leaderboard-container, .referral-container, .controls, .telegram-banner, .reward-claim-container {
-  margin-top: 25px;
-}
-
-.wheel-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.wheel-container {
-  position: relative;
-  margin-bottom: 15px;
-}
-
-#spin-button {
+#spinButton {
   background-color: #007bff;
   color: white;
-  padding: 12px 24px;
-  font-size: 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-#spin-button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
-
-#spin-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  transform: none;
-}
-
-#result {
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #28a745;
-}
-
-.leaderboard-container h2 {
-  color: #333;
-  margin-bottom: 10px;
-}
-
-#leaderboard {
-  margin-top: 10px;
-  text-align: left;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: #f9f9f9;
-}
-
-.leaderboard div {
-  padding: 8px 0;
-  border-bottom: 1px dashed #eee;
-}
-
-.leaderboard div:last-child {
-  border-bottom: none;
-}
-
-.referral-container label, .user-info label {
-  display: block;
-  margin-bottom: 5px;
-  color: #555;
-}
-
-.referral-container input[type="text"], .user-info input[type="text"] {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.referral-container button, .user-info button, .controls button, .reward-claim-container button {
-  background-color: #28a745;
+#dailyCheckin {
+  background-color: orange;
   color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-right: 5px;
 }
 
-.referral-container button:hover, .user-info button:hover, .controls button:hover, .reward-claim-container button:hover {
-  background-color: #1e7e34;
+#submitReferral,
+#saveName,
+#claimReward,
+#withdrawBtn {
+  background-color: green;
+  color: white;
 }
 
-.controls button {
-  background-color: #6c757d;
+#muteButton,
+#darkModeToggle {
+  background-color: #555;
+  color: white;
 }
 
-.controls button:hover {
-  background-color: #5a6268;
-}
-
-#daily-checkin-button {
-  background-color: #f39c12;
-}
-
-#daily-checkin-button:hover {
-  background-color: #e68a00;
-}
-
-#daily-checkin-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.telegram-banner {
-  margin-top: 30px;
-}
-
-.telegram-banner a {
+a {
   color: #007bff;
   text-decoration: none;
   font-weight: bold;
 }
 
-#confetti-container {
+#leaderboard {
+  text-align: left;
+  margin: 10px auto;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+canvas#wheelCanvas {
+  margin-top: 20px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  background-color: #fff8f0;
+}
+
+canvas#confettiCanvas {
   position: fixed;
+  pointer-events: none;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
+  z-index: 999;
 }
 
-#referral-code {
-  margin-top: 10px;
-  font-size: 16px;
-  color: #007bff;
-  font-weight: bold;
+/* Dark mode */
+body.dark {
+  background-color: #121212;
+  color: #fff;
 }
 
-#wheel {
-  /* కాన్వాస్‌కు బార్డర్ తీసివేశాను */
+body.dark .container {
+  background-color: #1e1e1e;
+}
+
+body.dark input,
+body.dark button {
+  background-color: #2c2c2c;
+  color: white;
+  border: 1px solid #444;
+}
+
+body.dark #leaderboard {
+  background-color: #2c2c2c;
+  border-color: #444;
 }
