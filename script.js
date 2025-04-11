@@ -92,63 +92,30 @@ function updateSpinButtonState() {
   }
 }
 
-function drawWheel() {
-  ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, centerX, 0, 2 * Math.PI);
-  ctx.strokeStyle = 'black';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fill();
+window.onload = () => {
+  loadDarkModePreference();
+  loadSoundPreference();
+  checkDailySpinReset();
+  checkDailyCheckin();
+  animateCoins(0, userData.coins);
+  updateLeaderboard();
 
-  const angle = Math.PI * 2 / numSegments;
-  for (let i = 0; i < numSegments; i++) {
-    const startAngle = i * angle;
-    const endAngle = (i + 1) * angle;
+  const wheelCanvas = document.getElementById('wheel');
+  const ctx = wheelCanvas.getContext('2d');
 
-    ctx.fillStyle = segments[i].color;
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, centerX, startAngle, endAngle);
-    ctx.lineTo(centerX, centerY);
-    ctx.fill();
-
-    ctx.fillStyle = 'black';
-    ctx.font = 'bold 20px sans-serif';
-    ctx.textAlign = 'center';
-    const textRadius = centerX * 0.6;
-    const textX = centerX + textRadius * Math.cos(startAngle + angle / 2);
-    const textY = centerY + textRadius * Math.sin(startAngle + angle / 2) + 7;
-
-    ctx.save();
-    ctx.translate(textX, textY);
-    ctx.rotate(startAngle + angle / 2 + Math.PI / 2);
-    ctx.fillText(segments[i].name, 0, 0);
-    ctx.restore();
-
-    if (segments[i].icon) {
-      const img = new Image();
-      img.onload = () => {
-        const iconSize = 30;
-        const iconRadius = centerX * 0.7;
-        const iconAngle = startAngle + angle / 2;
-        const iconX = centerX + iconRadius * Math.cos(iconAngle) - iconSize / 2;
-        const iconY = centerY + iconRadius * Math.sin(iconAngle) - iconSize / 2;
-        ctx.drawImage(img, iconX, iconY, iconSize, iconSize);
-      };
-      img.src = segments[i].icon;
-    }
+  if (ctx) {
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(100, 100, 50, 50);
+  } else {
+    console.error('Could not get canvas context!');
   }
 
-  ctx.fillStyle = 'black';
-  ctx.beginPath();
-  ctx.moveTo(centerX, centerY - centerX - 15);
-  ctx.lineTo(centerX - 15, centerY - centerX - 30);
-  ctx.lineTo(centerX + 15, centerY - centerX - 30);
-  ctx.closePath();
-  ctx.fill();
-}
+  // drawWheel(); // ప్రస్తుతానికి దీన్ని కామెంట్ చేశాను
+
+  if (userData.username) {
+    referralCodeDisplay.textContent = `Your Referral Code: ${userData.referral}`;
+  }
+};
 
 function getWinningSegment() {
   const normalizedRotation = rotation % (2 * Math.PI);
@@ -208,7 +175,7 @@ function spinWheel() {
       rotation = randomSpinAngle;
       spinning = false;
       onSpinEnd();
-      drawWheel();
+      // drawWheel(); // దీన్ని ఇక్కడ కాల్ చేయకూడదు
       return;
     }
 
@@ -216,7 +183,7 @@ function spinWheel() {
     const timeFraction = ease(elapsedTime / animationDuration);
     rotation = randomSpinAngle * timeFraction;
 
-    drawWheel();
+    // drawWheel(); // దీన్ని ఇక్కడ కాల్ చేయకూడదు
     requestAnimationFrame(animateSpin);
   }
 
@@ -368,15 +335,3 @@ soundButton.addEventListener('click', toggleSound);
 darkModeButton.addEventListener('click', toggleDarkMode);
 claimRewardButton.addEventListener('click', claimReward);
 dailyCheckinButton.addEventListener('click', handleDailyCheckin);
-window.onload = () => {
-  loadDarkModePreference();
-  loadSoundPreference();
-  checkDailySpinReset();
-  checkDailyCheckin();
-  animateCoins(0, userData.coins);
-  updateLeaderboard();
-  drawWheel();
-  if (userData.username) {
-    referralCodeDisplay.textContent = `Your Referral Code: ${userData.referral}`;
-  }
-};
