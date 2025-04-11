@@ -332,6 +332,10 @@ window.onload = () => {
   const wheelCanvas = document.getElementById('wheel');
   const ctx = wheelCanvas.getContext('2d');
 
+  // ఇక్కడ కాన్వాస్ డైమెన్షన్స్‌ను సెట్ చేస్తున్నాము
+  wheelCanvas.width = 400;
+  wheelCanvas.height = 400;
+
   console.log("Canvas Width:", wheelCanvas.width); // కాన్వాస్ వెడల్పును తనిఖీ చేయడానికి
   console.log("Canvas Height:", wheelCanvas.height); // కాన్వాస్ ఎత్తును తనిఖీ చేయడానికి
 
